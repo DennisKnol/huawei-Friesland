@@ -15,7 +15,7 @@ print(client.device.information())  # Needs valid authorization, will throw exce
 print(client.sms.sms_count())
 
 
-for _ in range(0, 1):
+for _ in range(0, 5):
     client.sms.send_sms([1280], "1GB EXTRA")
 
 # sms_list = client.sms.get_sms_list()
