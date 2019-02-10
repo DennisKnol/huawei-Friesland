@@ -1,4 +1,4 @@
-
+from collections import OrderedDict
 from huawei_lte_api.ApiGroup import ApiGroup
 from huawei_lte_api.AuthorizedConnection import authorized_call
 
@@ -20,13 +20,13 @@ class Security(ApiGroup):
                             url_filter: bool=False,
                             mac_filter: bool=False
                             ) -> dict:
-        return self._connection.post('security/firewall-switch', {
-            'FirewallMainSwitch': int(firewall),
-            'FirewallIPFilterSwitch': int(ip_filter),
-            'FirewallWanPortPingSwitch': int(wan_ping_filter),
-            'firewallurlfilterswitch': int(url_filter),
-            'firewallmacfilterswitch': int(mac_filter)
-        })
+        return self._connection.post('security/firewall-switch', OrderedDict((
+            ('FirewallMainSwitch', int(firewall)),
+            ('FirewallIPFilterSwitch', int(ip_filter)),
+            ('FirewallWanPortPingSwitch', int(wan_ping_filter)),
+            ('firewallurlfilterswitch', int(url_filter)),
+            ('firewallmacfilterswitch', int(mac_filter))
+        )))
 
     @authorized_call
     def mac_filter(self) -> dict:
@@ -47,3 +47,31 @@ class Security(ApiGroup):
     @authorized_call
     def upnp(self) -> dict:
         return self._connection.get('security/upnp')
+
+    @authorized_call
+    def set_upnp(self, enabled: bool):
+        return self._connection.post('security/upnp', {
+            'UpnpStatus': int(enabled),
+        })
+
+    @authorized_call
+    def dmz(self) -> dict:
+        return self._connection.get('security/dmz')
+
+    @authorized_call
+    def set_dmz(self, enabled: bool, ip_address: str):
+        return self._connection.post('security/dmz', OrderedDict((
+            ('DmzStatus', int(enabled)),
+            ('DmzIPAddress', ip_address)
+        )))
+
+    @authorized_call
+    def sip(self) -> dict:
+        return self._connection.get('security/sip')
+
+    @authorized_call
+    def set_sip(self, enabled: bool, port: int):
+        return self._connection.post('security/sip', OrderedDict((
+            ('SipStatus', int(enabled)),
+            ('SipPort', port)
+        )))
