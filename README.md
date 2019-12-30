@@ -5,14 +5,55 @@ you can use this to simply send SMS, get information about your internet usage, 
 Tested on:
 * Huawei B310s-22
 * Huawei B525s-23a
+* Huawei B525s-65a
+* Huawei B715s-23c
+* Huawei E3131
 * Huawei E5186s-22a
+* Huawei B528s
+* (probably will work for other Huawei LTE devices too)
+
+Will NOT work on:
+* Huawei B2368-22 (Incompatible firmware, testing device needed!)
 
 PS: it is funny how many stuff you can request from modem/router without any authentication
 
 ## Installation
 
+### PIP (pip3 on some distros)
 ```bash
 $ pip install huawei-lte-api
+```
+### Repository
+You can also use these repositories maintained by me
+#### Debian and derivates
+
+Add repository by running these commands
+
+```
+$ wget -O - https://apt.salamek.cz/apt/conf/salamek.gpg.key|sudo apt-key add -
+$ echo "deb     https://apt.salamek.cz/apt all main" | sudo tee /etc/apt/sources.list.d/salamek.cz.list
+```
+
+And then you can install a package python3-huawei-lte-api
+
+```
+$ apt update && apt install python3-huawei-lte-api
+```
+
+#### Archlinux
+
+Add repository by adding this at end of file /etc/pacman.conf
+
+```
+[salamek]
+Server = https://arch.salamek.cz/any
+SigLevel = Optional
+```
+
+and then install by running
+
+```
+$ pacman -Sy python-huawei-lte-api
 ```
 
 ## Usage
@@ -43,4 +84,14 @@ Result dict
 ## Code examples
 ### Monitoring
 
-Monitoring traffic and signal https://github.com/littlejo/huawei-lte-examples
+* Monitoring traffic and signal https://github.com/littlejo/huawei-lte-examples
+
+### SMS
+
+* Relay received SMS into your email https://github.com/chenwei791129/Huawei-LTE-Router-SMS-to-E-mail-Sender
+
+
+## Donations
+
+* 250 CZK (9,79 EUR) for B535-232 fund, thx @larsvinc !
+

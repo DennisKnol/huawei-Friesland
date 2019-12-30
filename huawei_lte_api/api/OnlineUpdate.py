@@ -1,12 +1,10 @@
 from huawei_lte_api.ApiGroup import ApiGroup
-from huawei_lte_api.AuthorizedConnection import authorized_call
 
 
 class OnlineUpdate(ApiGroup):
     def check_new_version(self) -> dict:
         return self._connection.get('online-update/check-new-version')
 
-    @authorized_call
     def set_check_new_version(self) -> dict:
         return self._connection.post('online-update/check-new-version')
 
@@ -25,6 +23,9 @@ class OnlineUpdate(ApiGroup):
         })
 
     def cancel_downloading(self) -> dict:
+        """
+        Invoking this method is known to cause some devices to reboot.
+        """
         return self._connection.get('online-update/cancel-downloading')
 
     def set_cancel_downloading(self):
@@ -38,9 +39,11 @@ class OnlineUpdate(ApiGroup):
             'messagebox': messagebox
         })
 
-    @authorized_call
     def configuration(self) -> dict:
         return self._connection.get('online-update/configuration')
 
     def autoupdate_config(self) -> dict:
         return self._connection.get('online-update/autoupdate-config')
+
+    def redirect_cancel(self) -> dict:
+        return self._connection.get('online-update/redirect_cancel')

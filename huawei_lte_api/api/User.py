@@ -1,23 +1,24 @@
 import base64
 import hashlib
+from typing import Optional
 from huawei_lte_api.enums.user import PasswordTypeEnum, LoginStateEnum, LoginErrorEnum
 from huawei_lte_api.enums.client import ResponseEnum
 from huawei_lte_api.ApiGroup import ApiGroup
-from huawei_lte_api.AuthorizedConnection import authorized_call
 from huawei_lte_api.exceptions import ResponseErrorException, \
     LoginErrorAlreadyLoginException, \
     LoginErrorUsernamePasswordModifyException, \
     LoginErrorUsernamePasswordOverrunException, \
     LoginErrorUsernamePasswordWrongException, \
     LoginErrorUsernameWrongException, \
-    LoginErrorPasswordWrongException
+    LoginErrorPasswordWrongException, \
+    ResponseErrorNotSupportedException
 
 
 class User(ApiGroup):
     _username = 'admin'
     _password = None
 
-    def __init__(self, connection, username: str=None, password: str=None):
+    def __init__(self, connection, username: Optional[str]=None, password: Optional[str]=None):
         super(User, self).__init__(connection)
         self._username = username if username else 'admin'
         self._password = password
@@ -44,7 +45,7 @@ class User(ApiGroup):
                 'Username': self._username,
                 'Password': password.decode('UTF-8'),
                 'password_type': password_type.value
-            }, refresh_csfr=True)
+            }, refresh_csrf=True)
         except ResponseErrorException as e:
             error_code_to_message = {
                 LoginErrorEnum.USERNAME_WRONG: 'Username wrong',
@@ -71,13 +72,16 @@ class User(ApiGroup):
         return result == ResponseEnum.OK.value
 
     def login(self, force_new_login: bool=False) -> bool:
-        state_login = self.state_login()
+        try:
+            state_login = self.state_login()
+        except ResponseErrorNotSupportedException:
+            return True
+
         if LoginStateEnum(int(state_login['State'])) == LoginStateEnum.LOGGED_IN and not force_new_login:
             return True
 
         return self._login(PasswordTypeEnum(int(state_login['password_type'])))
 
-    @authorized_call
     def logout(self):
         return self._connection.post('user/logout', {
             'Logout': 1
@@ -96,3 +100,21 @@ class User(ApiGroup):
         return self._connection.post('user/remind', {
             'remindstate': remind_state
         })
+
+    def authentication_login(self) -> dict:
+        return self._connection.get('user/authentication_login')
+
+    def challenge_login(self) -> dict:
+        return self._connection.get('user/challenge_login')
+
+    def hilink_login(self) -> dict:
+        return self._connection.get('user/hilink_login')
+
+    def history_login(self) -> dict:
+        return self._connection.get('user/history-login')
+
+    def heartbeat(self) -> dict:
+        return self._connection.get('user/heartbeat')
+
+    def web_feature_switch(self) -> dict:
+        return self._connection.get('user/web-feature-switch')

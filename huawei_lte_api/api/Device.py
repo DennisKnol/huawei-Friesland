@@ -1,11 +1,8 @@
-
 from huawei_lte_api.ApiGroup import ApiGroup
 from huawei_lte_api.enums.device import AntennaTypeEnum
-from huawei_lte_api.AuthorizedConnection import authorized_call
 
 
 class Device(ApiGroup):
-    @authorized_call
     def information(self) ->dict:
         return self._connection.get('device/information')
 
@@ -17,6 +14,9 @@ class Device(ApiGroup):
 
     def basic_information(self) ->dict:
         return self._connection.get('device/basic_information')
+
+    def basicinformation(self) ->dict:
+        return self._connection.get('device/basicinformation')
 
     def usb_tethering_switch(self) ->dict:
         return self._connection.get('device/usb-tethering-switch')
@@ -32,7 +32,6 @@ class Device(ApiGroup):
     def signal(self) ->dict:
         return self._connection.get('device/signal')
 
-    @authorized_call
     def control(self, control: int):
         return self._connection.post('device/control', {
             'Control': control
@@ -54,3 +53,6 @@ class Device(ApiGroup):
 
     def antenna_type(self) -> dict:
         return self._connection.get('device/antenna_type')
+
+    def antenna_set_type(self) -> dict:
+        return self._connection.get('device/antenna_set_type')

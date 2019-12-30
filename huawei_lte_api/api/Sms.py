@@ -1,7 +1,7 @@
 import datetime
 from collections import OrderedDict
+from typing import Optional
 from huawei_lte_api.ApiGroup import ApiGroup
-from huawei_lte_api.AuthorizedConnection import authorized_call
 from huawei_lte_api.enums.sms import BoxTypeEnum, TextModeEnum, SaveModeEnum, SendTypeEnum, PriorityEnum
 
 
@@ -15,14 +15,12 @@ class Sms(ApiGroup):
     def splitinfo_sms(self) -> dict:
         return self._connection.get('sms/splitinfo-sms')
 
-    @authorized_call
     def sms_feature_switch(self) -> dict:
         return self._connection.get('sms/sms-feature-switch')
 
     def send_status(self) -> dict:
         return self._connection.get('sms/send-status')
 
-    @authorized_call
     def get_sms_list(self,
                      page: int=1,
                      box_type: BoxTypeEnum=BoxTypeEnum.LOCAL_INBOX,
@@ -41,34 +39,30 @@ class Sms(ApiGroup):
             ('UnreadPreferred', unread_preferred),
         )))
 
-    @authorized_call
     def delete_sms(self, sms_ids: list):
         data = []
         for sms_id in sms_ids:
             data.append({'Index': sms_id})
         return self._connection.post('sms/delete-sms', data)
 
-    @authorized_call
     def backup_sim(self, from_date: datetime.datetime, is_move: bool=False):
         return self._connection.post('sms/backup-sim', OrderedDict((
             ('IsMove', int(is_move)),
             ('Date', from_date.strftime("%Y-%m-%d %H:%M:%S"))
         )))
 
-    @authorized_call
     def set_read(self, sms_id: int):
         return self._connection.post('sms/set-read', {
             'Index': sms_id
         })
 
-    @authorized_call
     def save_sms(self,
                  phone_numbers: list,
                  message: str,
                  sms_index: int=-1,
                  sca: str='',
                  text_mode: TextModeEnum=TextModeEnum.SEVEN_BIT,
-                 from_date: datetime.datetime=None,
+                 from_date: Optional[datetime.datetime]=None,
                  ):
 
         if from_date is None:
@@ -87,14 +81,13 @@ class Sms(ApiGroup):
             ('Date', from_date.strftime("%Y-%m-%d %H:%M:%S"))
         )), dicttoxml_xargs=dicttoxml_xargs)
 
-    @authorized_call
     def send_sms(self,
                  phone_numbers: list,
                  message: str,
                  sms_index: int=-1,
                  sca: str='',
                  text_mode: TextModeEnum=TextModeEnum.SEVEN_BIT,
-                 from_date: datetime.datetime=None,
+                 from_date: Optional[datetime.datetime]=None,
                  ):
 
         if from_date is None:
@@ -120,11 +113,9 @@ class Sms(ApiGroup):
             'root': False,
         })
 
-    @authorized_call
     def config(self) -> dict:
         return self._connection.get('sms/config')
 
-    @authorized_call
     def set_config(self,
                    sca: str,
                    save_mode: SaveModeEnum=SaveModeEnum.LOCAL,
@@ -141,3 +132,6 @@ class Sms(ApiGroup):
             ('SendType', send_type.value),
             ('Priority', priority.value)
         )))
+
+    def sms_count_contact(self) -> dict:
+        return self._connection.get('sms/sms-count-contact')

@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from huawei_lte_api.ApiGroup import ApiGroup
-from huawei_lte_api.AuthorizedConnection import authorized_call
 from huawei_lte_api.enums.wlan import AuthModeEnum, WepEncryptModeEnum, WpaEncryptModeEnum
 
 
@@ -14,7 +13,6 @@ class WLan(ApiGroup):
     def basic_settings(self) -> dict:
         return self._connection.get('wlan/basic-settings')
 
-    @authorized_call
     def set_basic_settings(self, ssid: str, hide: bool=False, wifi_restart: bool=False):
         return self._connection.post('wlan/basic-settings', OrderedDict((
             ('WifiSsid', ssid),
@@ -22,11 +20,9 @@ class WLan(ApiGroup):
             ('WifiRestart', int(wifi_restart))
         )))
 
-    @authorized_call
     def security_settings(self) -> dict:
         return self._connection.get('wlan/security-settings')
 
-    @authorized_call
     def set_security_settings(self,
                               wpa_psk: str,
                               wep_key: str='',
@@ -44,19 +40,15 @@ class WLan(ApiGroup):
             ('WifiRestart', int(wifi_restart))
         )))
 
-    @authorized_call
     def multi_security_settings(self) -> dict:
         return self._connection.get('wlan/multi-security-settings')
 
-    @authorized_call
     def multi_security_settings_ex(self) -> dict:
         return self._connection.get('wlan/multi-security-settings-ex')
 
-    @authorized_call
     def multi_basic_settings(self) -> dict:
         return self._connection.get('wlan/multi-basic-settings')
 
-    @authorized_call
     def set_multi_basic_settings(self, clients: list) -> dict:
         """
 
@@ -70,9 +62,17 @@ class WLan(ApiGroup):
             'WifiRestart': 1
         })
 
-    @authorized_call
     def host_list(self) -> dict:
-        return self._connection.get('wlan/host-list')
+        # Make sure Hosts->Host is a list
+        # It may be returned as a single dict if only one is associated,
+        # as well as sometimes None.
+        hosts = self._connection.get('wlan/host-list')
+        if hosts.get('Hosts') is None:
+            hosts['Hosts'] = {}
+        host = hosts['Hosts'].setdefault('Host', [])
+        if isinstance(host, dict):
+            hosts['Hosts']['Host'] = [host]
+        return hosts
 
     def handover_setting(self) -> dict:
         return self._connection.get('wlan/handover-setting')
@@ -91,11 +91,9 @@ class WLan(ApiGroup):
     def multi_switch_settings(self) -> dict:
         return self._connection.get('wlan/multi-switch-settings')
 
-    @authorized_call
     def multi_macfilter_settings(self) -> dict:
         return self._connection.get('wlan/multi-macfilter-settings')
 
-    @authorized_call
     def set_multi_macfilter_settings(self, clients: list) -> dict:
         """
 
@@ -108,33 +106,32 @@ class WLan(ApiGroup):
             }
         })
 
-    @authorized_call
+    def multi_macfilter_settings_ex(self) -> dict:
+        return self._connection.get('wlan/multi-macfilter-settings-ex')
+
     def mac_filter(self) -> dict:
         return self._connection.get('wlan/mac-filter')
 
-    @authorized_call
     def set_mac_filter(self, hostname: str, mac: str):
         return self._connection.post('wlan/mac-filter', OrderedDict((
             ('wifihostname', hostname),
             ('WifiMacFilterMac', mac)
         )))
 
-    @authorized_call
     def oled_showpassword(self) -> dict:
         return self._connection.get('wlan/oled-showpassword')
 
-    @authorized_call
     def wps(self) -> dict:
         return self._connection.get('wlan/wps')
 
-    @authorized_call
     def wps_appin(self) -> dict:
         return self._connection.get('wlan/wps-appin')
 
-    @authorized_call
     def wps_pbc(self) -> dict:
         return self._connection.get('wlan/wps-pbc')
 
-    @authorized_call
     def wps_switch(self) -> dict:
         return self._connection.get('wlan/wps-switch')
+
+    def status_switch_settings(self) -> dict:
+        return self._connection.get('wlan/status-switch-settings')
